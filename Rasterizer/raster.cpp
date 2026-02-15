@@ -163,7 +163,7 @@ void renderMeshes(Renderer& renderer, Mesh* const* meshes, size_t meshCount, mat
     const float half_height = 0.5f * canvas_height;
     const float one = 1.0f;
     const float z_threshold = 1.0f;
-    constexpr int kRenderThreads = 11;
+    constexpr int kRenderThreads = 9;
 
     const matrix vp = renderer.perspective * camera;
 
@@ -567,9 +567,9 @@ void scene2() {
 // No input variables
 int main() {
     // Uncomment the desired scene function to run
-    scene1();
+    //scene1();
     //scene2();
-    //sceneTest(); 
+    sceneTest(); 
     
 
     return 0;
