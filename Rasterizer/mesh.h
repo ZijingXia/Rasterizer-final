@@ -25,7 +25,7 @@ struct triIndices {
     }
 };
 
-// 按分量存储的顶点缓冲区（SoA）
+// SOA
 struct VertexBufferSoA {
     std::vector<float> px, py, pz, pw;
     std::vector<float> nx, ny, nz;
@@ -60,7 +60,6 @@ public:
     std::vector<Vertex> vertices;       // List of vertices in the mesh
     std::vector<triIndices> triangles;  // List of triangles in the mesh
 
-    // SoA缓存：渲染阶段可直接按分量读取
     VertexBufferSoA soaBuffer;
     bool soaDirty = true;
 
@@ -91,12 +90,11 @@ public:
         soaDirty = true;
     }
 
-    // 手动标记SoA缓存失效（当外部直接改写vertices时调用）
+	// if SOA buffer is dirty, mark it as dirty to indicate it needs to be updated
     void markSoADirty() {
         soaDirty = true;
     }
 
-    // 确保SoA缓存可用于渲染
     void ensureSoABuffer() {
         if (soaDirty || soaBuffer.px.size() != vertices.size()) {
             soaBuffer.fromVertices(vertices);

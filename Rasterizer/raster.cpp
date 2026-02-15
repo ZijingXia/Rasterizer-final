@@ -152,7 +152,7 @@ static constexpr std::size_t kParallelTriangleThreshold = 0;
 
 
 //============================
-//顶点处理
+//top dot
 //============================
 
 void renderMeshes(Renderer& renderer, Mesh* const* meshes, size_t meshCount, matrix& camera, Light& L)
@@ -163,7 +163,7 @@ void renderMeshes(Renderer& renderer, Mesh* const* meshes, size_t meshCount, mat
     const float half_height = 0.5f * canvas_height;
     const float one = 1.0f;
     const float z_threshold = 1.0f;
-    constexpr int kRenderThreads = 9;
+    constexpr int kRenderThreads = 2;
 
     const matrix vp = renderer.perspective * camera;
 
@@ -337,7 +337,7 @@ void sceneTest()
     std::vector<BallInstance> balls;
     std::vector<Mesh*> ballMeshes;
 
-    // ===== 更复杂的球阵列 =====
+	// scene 3 for 200 balls, 10 rows and 20 columns, with varying speeds and amplitudes
     const int rows = 10;
     const int cols = 20;
 
@@ -351,9 +351,9 @@ void sceneTest()
             b.baseY = 0.0f;
             b.z = -5.0f - r * 2.0f;
 
-            b.phase = (r + c) * 0.3f;        // 错开相位
-            b.speed = 0.5f + 0.2f * (r % 3); // 不同速度
-            b.amplitude = 2.0f + 0.5f * (c % 4); // 更大浮动
+            b.phase = (r + c) * 0.3f;
+            b.speed = 0.5f + 0.2f * (r % 3);
+            b.amplitude = 2.0f + 0.5f * (c % 4);
 
             balls.push_back(b);
 
@@ -366,7 +366,7 @@ void sceneTest()
     float time = 0.0f;
     float step = 0.03f;
 
-    // ===== 时间测试 =====
+    //time test
     auto start = std::chrono::high_resolution_clock::now();
     std::chrono::time_point<std::chrono::high_resolution_clock> end;
     int cycle = 0;
@@ -395,7 +395,7 @@ void sceneTest()
             }
         }
 
-        // ===== 渲染所有球（批量调用一次renderMeshes） =====
+        // render all the balls for only once
         for (size_t i = 0; i < balls.size(); ++i)
         {
             BallInstance& b = balls[i];
@@ -440,15 +440,15 @@ void scene1() {
     bool running = true;
     std::vector<Mesh*> scene;
 
-    // ===== 优化：复用基础Cube Mesh，只修改world矩阵 =====
+    // reuse cube
     Mesh* base_cube = new Mesh();
     *base_cube = Mesh::makeCube(1.f);
     base_cube->ka = 0.2f;
     base_cube->kd = 0.8f;
 
-    // 只创建40个Mesh实例，但复用同一个顶点/三角形数据
+    // reuse triangle
     for (unsigned int i = 0; i < 20; i++) {
-        Mesh* m = new Mesh(*base_cube); // 拷贝构造，复用顶点数据
+        Mesh* m = new Mesh(*base_cube);
         m->world = matrix::makeTranslation(-2.0f, 0.0f, (-3 * static_cast<float>(i))) * makeRandomRotation();
         scene.push_back(m);
 
@@ -456,7 +456,7 @@ void scene1() {
         m->world = matrix::makeTranslation(2.0f, 0.0f, (-3 * static_cast<float>(i))) * makeRandomRotation();
         scene.push_back(m);
     }
-    delete base_cube; // 释放基础Cube
+    delete base_cube;
 
     float zoffset = 8.0f;
     float step = -0.1f;
@@ -470,7 +470,7 @@ void scene1() {
 
         camera = matrix::makeTranslation(0, 0, -zoffset);
 
-        // ===== 优化：减慢旋转速度，减少矩阵乘法开销 =====
+		// reduce the rotation speed for better visualization (but I think this part cant be changed)
         scene[0]->world = scene[0]->world * matrix::makeRotateXYZ(0.01f, 0.01f, 0.0f);
         scene[1]->world = scene[1]->world * matrix::makeRotateXYZ(0.0f, 0.01f, 0.02f);
 
@@ -568,8 +568,8 @@ void scene2() {
 int main() {
     // Uncomment the desired scene function to run
     //scene1();
-    //scene2();
-    sceneTest(); 
+    scene2();
+    //sceneTest(); 
     
 
     return 0;
